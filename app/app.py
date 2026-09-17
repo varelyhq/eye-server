@@ -22,8 +22,8 @@ from datetime import datetime
 async def lifespan(app: FastAPI):
     await init_db()
     await dump_db_state()
-    scheduler.add_job(scraper_jobs.job_check_cams_status, 'interval', minutes=15, id='cams_15min', replace_existing=True, next_run_time=datetime.now())
-    scheduler.add_job(scraper_jobs.job_full_scrape, 'cron', hour=3, minute=0, id='cams_daily', replace_existing=True)
+    scheduler.add_job(scraper_jobs.job_check_cams_status, 'interval', minutes=15, id='cams_15min', replace_existing=True)
+    scheduler.add_job(scraper_jobs.job_full_scrape, 'cron', hour=3, minute=0, id='cams_daily', replace_existing=True, next_run_time=datetime.now())
     scheduler.start()
     yield
     scheduler.shutdown()
@@ -32,7 +32,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "https://eye.varely.co", "https://eye-b1un0d3js-varely.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
