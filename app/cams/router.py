@@ -2,7 +2,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException, Response, Request, Query
 
 from . import service
-from .schemas import CamOut, FavoriteIdsIn
+from .schemas import CamOut, FavoriteIdsIn, RandomCamIn
 
 from ..common.utils import get_client_ip
 from ..common.schemas import SuccessResponse
@@ -27,6 +27,11 @@ async def get_popular_cams():
 @router.post("/favorites", response_model=SuccessResponse[list[CamOut]])
 async def get_favorite_cams(payload: FavoriteIdsIn):
     cams = await service.get_cams_by_ids(payload.ids)
+    return SuccessResponse(cams)
+
+@router.post('/random', response_model=SuccessResponse[CamOut | None])
+async def get_random_cam(payload: RandomCamIn):
+    cams = await service.get_random_cam(payload.exclude_ids)
     return SuccessResponse(cams)
 
 @router.get("/cam/{cam_id}", response_model=SuccessResponse[CamOut])

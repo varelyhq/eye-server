@@ -39,6 +39,12 @@ async def get_popular_cams() -> list[Cam]:
         results = await session.execute(stmt)
         return list(results.scalars().all())
 
+async def get_random_cam(exclude_ids: list[int]) -> Cam | None:
+    async with async_session() as session:
+        stmt = select(Cam).where(Cam.id.not_in(exclude_ids)).where(Cam.is_online.is_(True)).order_by(func.random()).limit(1)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
 async def get_cams_by_ids(ids: list[str]) -> list[Cam]:
     if not ids:
         return []

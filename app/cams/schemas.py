@@ -19,3 +19,6 @@ class CamOut(BaseModel):
 
 class FavoriteIdsIn(BaseModel):
     ids: list[int]
+
+class RandomCamIn(BaseModel):
+    exclude_ids: list[int]
