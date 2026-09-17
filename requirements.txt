@@ -1,0 +1,12 @@
+python-socketio
+fastapi
+uvicorn[standard]
+aiosqlite
+PyJWT
+python-dotenv
+sqlalchemy[asyncio]>=2.0
+asyncpg
+httpx2
+lxml[cssselect]
+html-to-markdown
+apscheduler
