@@ -6,6 +6,12 @@ from datetime import datetime, timezone, timedelta
 from .models import Cam, UserCamView
 from ..database import async_session
 
+async def search_cams(value: str) -> Optional[Cam]:
+    async with async_session() as session:
+        stmt = select(Cam).where(Cam.name.ilike(f'%{value}%')).limit(10)
+        results = await session.execute(stmt)
+        return list(results.scalars().all())
+
 async def get_cam(cam_id: int) -> Optional[Cam]:
     async with async_session() as session:
         stmt = select(Cam).where(Cam.id == cam_id)
