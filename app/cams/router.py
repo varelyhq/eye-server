@@ -1,6 +1,5 @@
-from fastapi import APIRouter, HTTPException, Response, Request
-from sqlalchemy import inspect
-from datetime import date, datetime
+from typing import Annotated
+from fastapi import APIRouter, HTTPException, Response, Request, Query
 
 from . import service
 from .schemas import CamOut, FavoriteIdsIn
@@ -10,14 +9,10 @@ from ..common.schemas import SuccessResponse
 
 router = APIRouter()
 
-def temp_to_dict(cam) -> dict:
-        result = {}
-        for column in inspect(cam).mapper.column_attrs:
-            value = getattr(cam, column.key)
-            if isinstance(value, (datetime, date)):
-                value = value.isoformat()
-            result[column.key] = value
-        return result
+@router.get('/search', response_model=SuccessResponse[list[CamOut] | None])
+async def search_cams(q: Annotated[str, Query(min_length=1, max_length=100)]):
+    cams = await service.search_cams(q)
+    return SuccessResponse(cams)
 
 @router.get('/popular', response_model=SuccessResponse[list[CamOut] | None])
 async def get_popular_cams():
