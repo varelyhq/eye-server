@@ -40,18 +40,6 @@ app.add_middleware(
 
 socket_app = socketio.ASGIApp(sio, other_asgi_app=app)
 
-socket_app = CORSMiddleware(
-    socket_app,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://eye.varely.co",
-        "https://eye-b1un0d3js-varely.vercel.app",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 app.include_router(cams_router, prefix='/cams', tags=['cams'])
 app.include_router(ratings_router, prefix='/ratings', tags=['ratings'])
 
