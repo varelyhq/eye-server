@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException, Response, Request, Query
 
 from . import service
@@ -10,8 +10,13 @@ from ..common.schemas import SuccessResponse
 router = APIRouter()
 
 @router.get('/search', response_model=SuccessResponse[list[CamOut] | None])
-async def search_cams(q: Annotated[str, Query(min_length=1, max_length=100)]):
-    cams = await service.search_cams(q)
+async def search_cams(
+        q: Annotated[str | None, Query(min_length=0, max_length=100)] = '',
+        order_by: Annotated[Literal['default', 'popular', 'a-z', 'z-a'] | None, Query()] = None,
+        show_inactive: Annotated[bool | None, Query()] = None,
+        limit: Annotated[int | None, Query()] = 10,
+    ):
+    cams = await service.search_cams(q, order_by, show_inactive, limit)
     return SuccessResponse(cams)
 
 @router.get('/popular', response_model=SuccessResponse[list[CamOut] | None])

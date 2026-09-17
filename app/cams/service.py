@@ -1,14 +1,23 @@
 from typing import Optional
-from sqlalchemy import select, update, func
 from sqlalchemy.dialects.postgresql import insert
 from datetime import datetime, timezone, timedelta
+from sqlalchemy import select, update, func, asc, desc
 
 from .models import Cam, UserCamView
 from ..database import async_session
 
-async def search_cams(value: str) -> Optional[Cam]:
+async def search_cams(value: str, order_by: str = 'default', show_inactive: bool = True, limit: int = 10) -> list[Cam]:
+    order_by_stmts = {
+        'popular': desc(Cam.views),
+        'a-z': asc(Cam.name),
+        'z-a': desc(Cam.name),
+    }
+    order_by_stmt = order_by_stmts.get(order_by, asc(Cam.id))
     async with async_session() as session:
-        stmt = select(Cam).where(Cam.name.ilike(f'%{value}%')).limit(10)
+        stmt = select(Cam).where(Cam.name.ilike(f'%{value}%')).limit(limit)
+        if not show_inactive:
+            stmt = stmt.where(Cam.is_online.is_(True))
+        stmt = stmt.order_by(order_by_stmt)
         results = await session.execute(stmt)
         return list(results.scalars().all())
 
